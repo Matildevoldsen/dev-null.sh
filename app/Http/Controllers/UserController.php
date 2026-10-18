@@ -16,6 +16,7 @@ use App\Queries\UserAchievementsQuery;
 use App\Queries\UserActivityQuery;
 use App\Queries\UserCommitsQuery;
 use App\Queries\UserStreakQuery;
+use App\Services\Embeds;
 use App\Services\PageMetadata;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,7 @@ final readonly class UserController
     /**
      * Profiles are public, so guests and crawlers read the same page, with the profile's link preview.
      */
-    public function show(ShowUserRequest $request, #[CurrentUser] ?User $currentUser, User $user, UserActivityQuery $activity, UserStreakQuery $streaks, UserAchievementsQuery $achievements, PushAccessQuery $pushAccess, UserCommitsQuery $commits, PinnedCommitQuery $pinned, PageMetadata $metadata): Response
+    public function show(ShowUserRequest $request, #[CurrentUser] ?User $currentUser, User $user, UserActivityQuery $activity, UserStreakQuery $streaks, UserAchievementsQuery $achievements, PushAccessQuery $pushAccess, UserCommitsQuery $commits, PinnedCommitQuery $pinned, PageMetadata $metadata, Embeds $embeds): Response
     {
         $blockerId = $currentUser?->blockerIdWith($user);
 
@@ -51,6 +52,7 @@ final readonly class UserController
 
         return Inertia::render('user/show', [
             'user' => $getCountedUser,
+            'liveEmbed' => fn (): ?array => $user->isLive() ? $embeds->for((string) $user->live_url)?->toArray() : null,
             'pasteisReceived' => $currentUser?->pasteis_mode ? $user->pasteis_received : null,
             'isFollowing' => fn (): bool => $currentUser?->isFollowing($user) ?? false,
             'followsYou' => fn (): bool => $currentUser instanceof User && $user->isFollowing($currentUser),

@@ -19,6 +19,10 @@ export type User = {
     has_github_account: boolean;
     lane: Lane;
     timezone: string | null;
+    /**
+     * Only set while the user is streaming.
+     */
+    live_url?: string | null;
     created_at: string;
     updated_at: string;
 };

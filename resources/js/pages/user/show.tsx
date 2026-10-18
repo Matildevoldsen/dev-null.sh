@@ -21,6 +21,8 @@ import { ActivityStreaks } from '@/components/activity-streaks';
 import { CommitFeed, EmptyFeed } from '@/components/commit-feed';
 import { FollowButton } from '@/components/follow-button';
 import { GitHubIcon } from '@/components/github-icon';
+import { LinkEmbed } from '@/components/link-embed';
+import { LiveBadge } from '@/components/live-badge';
 import { PageTabs } from '@/components/page-tabs';
 import { PinCommitButton } from '@/components/pin-commit-button';
 import { ProfileShareButton } from '@/components/profile-share-button';
@@ -36,6 +38,7 @@ import type {
     Activity,
     Commit,
     CursorPaginated,
+    Embed,
     Profile,
     Streaks,
 } from '@/types';
@@ -46,6 +49,7 @@ function pluralize(count: number, singular: string, plural: string) {
 
 export default function Show({
     user,
+    liveEmbed,
     pasteisReceived,
     isFollowing,
     followsYou,
@@ -59,6 +63,7 @@ export default function Show({
     pinnedCommit,
 }: {
     user: Profile;
+    liveEmbed: Embed | null;
     pasteisReceived: number | null;
     isFollowing: boolean;
     followsYou: boolean;
@@ -173,8 +178,9 @@ export default function Show({
                     </div>
                 </div>
 
-                <h1 className="mt-4 text-2xl font-semibold tracking-tight text-balance">
+                <h1 className="mt-4 flex items-center gap-2 text-2xl font-semibold tracking-tight text-balance">
                     {user.name}
+                    {liveEmbed && <LiveBadge />}
                 </h1>
                 <div className="flex items-center gap-2">
                     <p className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
@@ -216,6 +222,22 @@ export default function Show({
                     <p className="mt-3 max-w-prose text-[15px] leading-relaxed wrap-break-word whitespace-pre-wrap">
                         {user.bio}
                     </p>
+                )}
+
+                {liveEmbed && user.live_url && (
+                    <div className="max-w-xl" data-test="profile-live-stream">
+                        <LinkEmbed
+                            preview={{
+                                url: user.live_url,
+                                title: `${user.name} is live`,
+                                description: null,
+                                image_url: null,
+                                site_name: liveEmbed.provider,
+                                is_pending: false,
+                            }}
+                            embed={liveEmbed}
+                        />
+                    </div>
                 )}
 
                 <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">

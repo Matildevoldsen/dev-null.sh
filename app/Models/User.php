@@ -42,6 +42,8 @@ use Illuminate\Support\Facades\DB;
  * @property-read CarbonInterface|null $pasteis_given_on
  * @property-read string|null $pinned_commit_id
  * @property-read string|null $timezone
+ * @property-read string|null $live_url
+ * @property-read CarbonInterface|null $live_since
  * @property-read Log $log
  * @property-read CarbonInterface|null $onboarded_at
  * @property-read CarbonInterface|null $github_follows_imported_at
@@ -83,6 +85,8 @@ use Illuminate\Support\Facades\DB;
     'log',
     'onboarded_at',
     'github_follows_imported_at',
+    'live_url',
+    'live_since',
 ])]
 final class User extends Authenticatable
 {
@@ -92,6 +96,11 @@ final class User extends Authenticatable
     use HasUuids;
 
     public const int DAILY_PASTEIS = 10;
+
+    /**
+     * How long a stream shows as live when its author forgets to end it.
+     */
+    public const int LIVE_HOURS = 12;
 
     /**
      * @var array<string, mixed>
@@ -105,6 +114,8 @@ final class User extends Authenticatable
         'pasteis_received' => 0,
         'pasteis_given_today' => 0,
         'pasteis_given_on' => null,
+        'live_url' => null,
+        'live_since' => null,
     ];
 
     /**
@@ -139,6 +150,8 @@ final class User extends Authenticatable
             'onboarded_at' => 'datetime',
             'github_follows_imported_at' => 'datetime',
             'remember_token' => 'string',
+            'live_url' => 'string',
+            'live_since' => 'datetime',
             'github_synced_at' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -449,7 +462,13 @@ final class User extends Authenticatable
             ...parent::toArray(),
             'lane' => $this->lane(),
             'has_github_account' => $this->hasGitHubAccount(),
+            'live_url' => $this->isLive() ? $this->live_url : null,
         ];
+    }
+
+    public function isLive(): bool
+    {
+        return $this->live_url !== null && $this->live_since?->isAfter(now()->subHours(self::LIVE_HOURS)) === true;
     }
 
     /**

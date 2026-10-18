@@ -96,6 +96,8 @@ it('downloads a versioned private JSON file with an explicit profile and empty l
             'remotes_from' => 'following',
             'pull_receipts' => true,
             'pinned_commit_id' => null,
+            'live_url' => null,
+            'live_since' => null,
             'created_at' => $user->created_at->toIso8601String(),
             'updated_at' => $user->updated_at->toIso8601String(),
         ],

@@ -5,6 +5,7 @@ import UserProfileController from '@/actions/App/Http/Controllers/UserProfileCon
 import ActivityGraphEmbed from '@/components/activity-graph-embed';
 import DeleteUser from '@/components/delete-user';
 import { GitHubProfile } from '@/components/github-profile';
+import { GoLiveSetting } from '@/components/go-live-setting';
 import Heading from '@/components/heading';
 import LanePicker from '@/components/lane-picker';
 import { PasteisModeSetting } from '@/components/pasteis-mode-setting';
@@ -134,6 +135,8 @@ export default function Edit({
             <PasteisModeSetting />
 
             <RemotesSetting />
+
+            <GoLiveSetting />
 
             <ActivityGraphEmbed
                 activityGraphUrl={activityGraphUrl}
