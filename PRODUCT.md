@@ -45,7 +45,7 @@ What exists, one line each (details in the knowledge base):
 Rules every feature must keep:
 
 - **An account is a GitHub account.** Accounts are only ever created from GitHub, and identity (name, avatar, bio, username) always comes from GitHub. Another sign-in method may only be a second way into an existing GitHub-created account, such as Sign in with Apple in the mobile app, which the App Store requires.
-- **Nothing is public before moderation.** Content shows to others and notifies anyone only once approved; pending and rejected content is visible to its author only. Mutes and blocks filter everywhere: logs, threads, search, suggestions, notifications.
+- **Nothing is public before moderation.** Content shows to others and notifies anyone only once approved; pending and rejected content is visible only to its author and to moderators. Mutes and blocks filter everywhere: logs, threads, search, suggestions, notifications.
 - **Commits are immutable.** Create and delete, never edit. Deletion can be undone briefly, and a deleted commit leaves an authorless tombstone so other people's replies survive.
 - **Store as little as possible.** Assume the database has leaked: no data without a feature that needs it, private content encrypted, no secrets stored, and everything about a person erased with their account and included in their export (see `.ai/guidelines/data.blade.php`).
 - **Same rules on every surface.** Web, mobile API, terminal, and Action share validation, moderation, visibility, and rate limits.
