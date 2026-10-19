@@ -28,6 +28,7 @@ import {
 import { PageTabs } from '@/components/page-tabs';
 import { PinCommitButton } from '@/components/pin-commit-button';
 import { ProfileActionsMenu } from '@/components/profile-actions-menu';
+import { ProfileBio } from '@/components/profile-bio';
 import { ProfileShareButton } from '@/components/profile-share-button';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/user-avatar';
@@ -244,11 +245,7 @@ export default function Show({
                     </button>
                 </div>
 
-                {user.bio && (
-                    <p className="mt-3 max-w-prose text-[15px] leading-relaxed wrap-break-word whitespace-pre-wrap">
-                        {user.bio}
-                    </p>
-                )}
+                <ProfileBio bio={user.bio} />
 
                 <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
                     {user.company && (
