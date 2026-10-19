@@ -44,6 +44,7 @@ final class Tom implements Agent, Conversational, HasProviderOptions, HasTools
         $characters = mb_strlen($this->commit->body) + $messages->sum(fn (Message $message): int => mb_strlen($message->content ?? ''));
 
         return mb_trim(view('ai.agents.tom', [
+            'username' => $this->commit->user?->username,
             'nearlyFull' => $characters >= 9600 || $messages->count() >= 10,
         ])->render());
     }

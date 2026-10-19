@@ -69,13 +69,15 @@ it('remembers only the public ancestor branch with the correct speakers', functi
     $answer = Commit::factory()->for($root, 'parent')->for($tom)->create(['body' => 'A developer community.']);
     Commit::factory()->for($root, 'parent')->create(['body' => 'A different branch.']);
     Commit::factory()->create(['body' => 'An unrelated thread.']);
-    $question = Commit::factory()->for($answer, 'parent')->for($user)->create(['body' => '@tom and who started it?']);
+    $newcomer = User::factory()->create(['username' => 'bob']);
+    $question = Commit::factory()->for($answer, 'parent')->for($newcomer)->create(['body' => '@tom and who started it?']);
 
     expect(new Tom($question)->messages()->map(fn (Message $message): array => [$message->role->value, $message->content])->all())->toBe([
         ['user', '@alice: What is this place?'],
         ['assistant', '@tom: A developer community.'],
     ]);
-    expect(new Tom($question)->instructions())->not->toContain('2012 RAM');
+    expect(new Tom($question)->instructions())->toContain('The latest message is by @bob.')
+        ->not->toContain('@alice', '2012 RAM');
 
     $root->update(['status' => CommitStatus::Rejected]);
     expect(new Tom($question)->messages()->pluck('content')->all())->toBe(['@tom: A developer community.']);

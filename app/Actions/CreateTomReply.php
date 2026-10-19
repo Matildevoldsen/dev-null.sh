@@ -25,7 +25,8 @@ final readonly class CreateTomReply
         $tom = User::query()->where('github_id', CreateTomFriendship::GITHUB_ID)->where('username', CreateTomFriendship::USERNAME)->first();
 
         if (! $commit instanceof Commit || ! $tom instanceof User || ! $this->replyable($commit, $tom)
-            || $commit->user?->is($tom) || ($commit->mentions[CreateTomFriendship::USERNAME] ?? null) !== $tom->id) {
+            || $commit->user?->is($tom)
+            || (($commit->mentions[CreateTomFriendship::USERNAME] ?? null) !== $tom->id && $commit->parent?->user_id !== $tom->id)) {
             return;
         }
 
