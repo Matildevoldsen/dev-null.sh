@@ -50,13 +50,7 @@ final readonly class PageMetadata
             'description' => $description,
             'url' => $url,
             'robots' => self::INDEXABLE,
-            'images' => [[
-                'url' => url('/og.png'),
-                'width' => OpenGraphCanvas::WIDTH,
-                'height' => OpenGraphCanvas::HEIGHT,
-                'type' => 'image/png',
-                'alt' => '/dev/null: a social network for developers',
-            ]],
+            'images' => [$this->defaultImage('/dev/null: a social network for developers')],
             'structuredData' => [
                 '@context' => 'https://schema.org',
                 '@graph' => [
@@ -96,13 +90,7 @@ final readonly class PageMetadata
             'description' => $description,
             'url' => $url,
             'robots' => self::INDEXABLE,
-            'images' => [[
-                'url' => url('/og.png'),
-                'width' => OpenGraphCanvas::WIDTH,
-                'height' => OpenGraphCanvas::HEIGHT,
-                'type' => 'image/png',
-                'alt' => $title,
-            ]],
+            'images' => [$this->defaultImage($title)],
             'structuredData' => [
                 '@context' => 'https://schema.org',
                 '@type' => 'WebPage',
@@ -249,7 +237,7 @@ final readonly class PageMetadata
     public function unclaimed(GitHubAccount $account, int $waiting): array
     {
         $username = $account->profile->username;
-        $title = $account->profile->name === $username ? "@{$username} on /dev/null" : "{$account->profile->name} (@{$username}) on /dev/null";
+        $title = "{$account->profile->nameWithHandle()} on /dev/null";
 
         return [
             'type' => 'profile',
@@ -261,13 +249,7 @@ final readonly class PageMetadata
             },
             'url' => route('user.show', ['user' => $username]),
             'robots' => self::NOT_INDEXABLE,
-            'images' => [[
-                'url' => url('/og.png'),
-                'width' => OpenGraphCanvas::WIDTH,
-                'height' => OpenGraphCanvas::HEIGHT,
-                'type' => 'image/png',
-                'alt' => $title,
-            ]],
+            'images' => [$this->defaultImage($title)],
             'username' => $username,
         ];
     }
@@ -334,6 +316,20 @@ final readonly class PageMetadata
         return [
             'url' => route('user-feed.show', $user),
             'title' => "{$user->nameWithHandle()} on /dev/null",
+        ];
+    }
+
+    /**
+     * @return Image
+     */
+    private function defaultImage(string $alt): array
+    {
+        return [
+            'url' => url('/og.png'),
+            'width' => OpenGraphCanvas::WIDTH,
+            'height' => OpenGraphCanvas::HEIGHT,
+            'type' => 'image/png',
+            'alt' => $alt,
         ];
     }
 

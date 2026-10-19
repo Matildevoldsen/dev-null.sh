@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\Models\PendingFollow;
 use App\Models\User;
 use App\Services\GitHub;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -45,8 +46,7 @@ final readonly class CreateUserGitHubFollows
 
         $followingIds = $this->github->accountIds("users/{$login}/following", self::MaxPages);
         $following = $this->users($user, $followingIds);
-        $followers = $this->users($user, $this->github->accountIds("users/{$login}/followers", self::MaxPages))
-            ->merge($this->waitingFollowers($user));
+        $followers = $this->users($user, $this->github->accountIds("users/{$login}/followers", self::MaxPages), withWaiting: true);
 
         DB::transaction(function () use ($user, $following, $followers, $followingIds, $notify): void {
             $followedIds = $user->following()->syncWithoutDetaching($following->modelKeys())['attached'];
@@ -70,27 +70,19 @@ final readonly class CreateUserGitHubFollows
     }
 
     /**
+     * The users here with the given GitHub accounts, and with those who followed the user on GitHub before they signed
+     * in when asked, including those past the 1,000 the import reads.
+     *
      * @param  list<string>  $githubIds
      * @return Collection<int, User>
      */
-    private function users(User $user, array $githubIds): Collection
+    private function users(User $user, array $githubIds, bool $withWaiting = false): Collection
     {
         return User::query()
-            ->whereIn('github_id', $githubIds)
-            ->whereKeyNot($user->id)
-            ->whereNotIn('id', $user->idsAcrossBlocks())
-            ->get();
-    }
-
-    /**
-     * Who followed the user on GitHub before they signed in, including those past the 1,000 the import reads.
-     *
-     * @return Collection<int, User>
-     */
-    private function waitingFollowers(User $user): Collection
-    {
-        return User::query()
-            ->whereIn('id', PendingFollow::query()->where('github_id', $user->github_id)->select('user_id'))
+            ->where(fn (Builder $query): Builder => $query
+                ->whereIn('github_id', $githubIds)
+                ->when($withWaiting, fn (Builder $query): Builder => $query
+                    ->orWhereIn('id', PendingFollow::query()->where('github_id', $user->github_id)->select('user_id'))))
             ->whereKeyNot($user->id)
             ->whereNotIn('id', $user->idsAcrossBlocks())
             ->get();

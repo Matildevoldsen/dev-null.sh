@@ -88,6 +88,7 @@ export function FoldedCommitBody({
 }) {
     const [isUnfolded, setIsUnfolded] = useState(false);
     const bodyRef = useRef<HTMLDivElement>(null);
+    const linksUnclaimed = mentions !== null;
 
     if (previewSegments === null) {
         return (
@@ -95,7 +96,7 @@ export function FoldedCommitBody({
                 segments={segments}
                 mentions={mentions}
                 className={className}
-                linksUnclaimed={mentions !== null}
+                linksUnclaimed={linksUnclaimed}
             />
         );
     }
@@ -122,7 +123,7 @@ export function FoldedCommitBody({
                 segments={isUnfolded ? segments : previewSegments}
                 mentions={mentions}
                 className={className}
-                linksUnclaimed={mentions !== null}
+                linksUnclaimed={linksUnclaimed}
             />
             {!isUnfolded && (
                 <button

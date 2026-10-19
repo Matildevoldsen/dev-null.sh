@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteUser;
-use App\Dto\GitHubAccount;
 use App\Enums\PushAccess;
 use App\Http\Requests\DeleteUserRequest;
 use App\Http\Requests\ShowUserRequest;
@@ -37,7 +36,7 @@ final readonly class UserController
         $user = $request->profile();
 
         if (! $user instanceof User) {
-            return $this->unclaimed($request, $request->account(), $currentUser, $mentions, $pendingFollowers, $metadata);
+            return $this->unclaimed($request, $currentUser, $mentions, $pendingFollowers, $metadata);
         }
 
         $blockerId = $currentUser?->blockerIdWith($user);
@@ -96,8 +95,9 @@ final readonly class UserController
      * who is waiting to follow them, and the commits that mention them. A GitHub account renamed since its owner last
      * signed in goes to the profile they already have, under its old username.
      */
-    private function unclaimed(ShowUserRequest $request, GitHubAccount $account, ?User $currentUser, PendingMentionCommitsQuery $mentions, PendingFollowersQuery $pendingFollowers, PageMetadata $metadata): Response|RedirectResponse
+    private function unclaimed(ShowUserRequest $request, ?User $currentUser, PendingMentionCommitsQuery $mentions, PendingFollowersQuery $pendingFollowers, PageMetadata $metadata): Response|RedirectResponse
     {
+        $account = $request->account();
         $owner = User::query()->where('github_id', $account->id)->first();
 
         if ($owner instanceof User) {

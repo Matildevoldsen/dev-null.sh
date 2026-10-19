@@ -346,33 +346,12 @@ function withMentions(
 
         parts.push(
             ...withWordmarks(text.slice(position, match.index), pasteisMode),
-            isStatic || (!userId && !linksUnclaimed) ? (
-                match[0]
-            ) : !userId ? (
-                // Nobody here has the username yet: it links to the profile waiting for them to claim it.
-                <Link
-                    key={`mention-${offset + match.index}`}
-                    href={showProfile(match[1])}
-                    rel="nofollow"
-                    className="font-medium text-primary hover:underline"
-                    data-test="unclaimed-mention"
-                >
-                    {match[0]}
-                </Link>
-            ) : (
-                <UserPreview
-                    key={`mention-${offset + match.index}`}
-                    user={{ username: match[1] }}
-                    userId={userId}
-                >
-                    <Link
-                        href={show(userId)}
-                        className="font-medium text-primary hover:underline"
-                        data-test="mention"
-                    >
-                        {match[0]}
-                    </Link>
-                </UserPreview>
+            mentionLink(
+                match[0],
+                match[1],
+                `mention-${offset + match.index}`,
+                isStatic ? null : userId,
+                !isStatic && linksUnclaimed,
             ),
         );
 
@@ -382,6 +361,48 @@ function withMentions(
     parts.push(...withWordmarks(text.slice(position), pasteisMode));
 
     return parts;
+}
+
+/**
+ * A mention links to the profile of whoever it captured, or else, in a posted commit, to the profile waiting for them
+ * to claim it, since nobody here has the username yet. Otherwise it stays plain text.
+ */
+function mentionLink(
+    mention: string,
+    username: string,
+    key: string,
+    userId: string | null,
+    linksUnclaimed: boolean,
+): ReactNode {
+    if (userId) {
+        return (
+            <UserPreview key={key} user={{ username }} userId={userId}>
+                <Link
+                    href={show(userId)}
+                    className="font-medium text-primary hover:underline"
+                    data-test="mention"
+                >
+                    {mention}
+                </Link>
+            </UserPreview>
+        );
+    }
+
+    if (linksUnclaimed) {
+        return (
+            <Link
+                key={key}
+                href={showProfile(username)}
+                rel="nofollow"
+                className="font-medium text-primary hover:underline"
+                data-test="unclaimed-mention"
+            >
+                {mention}
+            </Link>
+        );
+    }
+
+    return mention;
 }
 
 export function LinkifiedText({

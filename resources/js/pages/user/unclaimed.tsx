@@ -1,4 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
+import { MemberStack } from '@/components/chat/org';
 import { CommitFeed, EmptyFeed } from '@/components/commit-feed';
 import { GitHubIcon } from '@/components/github-icon';
 import { PageTabs } from '@/components/page-tabs';
@@ -95,23 +96,12 @@ export default function Unclaimed({
                         className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border px-4 py-3.5"
                         data-test="waiting-followers"
                     >
-                        <span className="flex -space-x-2" aria-hidden>
-                            {waiting.users.map((user, position) => (
-                                <UserAvatar
-                                    key={user.id}
-                                    user={user}
-                                    className="relative size-8 ring-2 ring-card"
-                                    style={{
-                                        zIndex: waiting.users.length - position,
-                                    }}
-                                />
-                            ))}
-                            {waiting.count > waiting.users.length && (
-                                <span className="relative flex h-8 min-w-8 items-center justify-center rounded-full bg-muted pr-1.5 pl-3 font-mono text-xs text-muted-foreground ring-2 ring-card">
-                                    +{waiting.count - waiting.users.length}
-                                </span>
-                            )}
-                        </span>
+                        <MemberStack
+                            users={waiting.users}
+                            max={waiting.users.length}
+                            total={waiting.count}
+                            avatarClassName="size-8"
+                        />
                         <span className="min-w-0 leading-snug">
                             <span className="block text-[15px]">
                                 <span className="font-mono font-medium">

@@ -7,7 +7,6 @@ namespace App\Queries;
 use App\Models\Commit;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 final readonly class PendingMentionCommitsQuery
@@ -28,14 +27,11 @@ final readonly class PendingMentionCommitsQuery
     {
         return $this->mentioning($username)
             ->visibleTo($viewer)
-            ->with(['parent' => fn (BelongsTo $query): BelongsTo => $query
-                ->where(fn (CommitBuilder $query): CommitBuilder => $query->visibleTo($viewer))
-                ->with('user')])
+            ->withVisibleParent($viewer)
             ->withVisibleReplyCount($viewer)
             ->withReplyPreviews($viewer)
             ->withCardDataFor($viewer)
-            ->latest()
-            ->latest('id');
+            ->newestFirst();
     }
 
     private function mentioning(string $username): CommitBuilder

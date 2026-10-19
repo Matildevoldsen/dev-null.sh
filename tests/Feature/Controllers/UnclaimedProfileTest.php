@@ -156,7 +156,7 @@ it('is not found for an organization, since nobody can sign in as one', function
     $this->get('/@laravel')->assertNotFound();
 });
 
-it('is not found while github cannot be reached, and asks again on the next visit', function (): void {
+it('is not found while github cannot be reached, and asks again a minute later', function (): void {
     Http::fakeSequence('api.github.com/users/ondrejmirtes')
         ->pushFailedConnection()
         ->push(['id' => 104888, 'login' => 'ondrejmirtes', 'type' => 'User', 'name' => 'Ondřej Mirtes']);
@@ -164,6 +164,10 @@ it('is not found while github cannot be reached, and asks again on the next visi
     mentionOf('ondrejmirtes');
 
     $this->get('/@ondrejmirtes')->assertNotFound();
+    $this->get('/@ondrejmirtes')->assertNotFound();
+
+    $this->travel(61)->seconds();
+
     $this->get('/@ondrejmirtes')->assertOk();
 
     Http::assertSentCount(2);

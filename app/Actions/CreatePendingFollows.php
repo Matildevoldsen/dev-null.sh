@@ -18,7 +18,7 @@ final readonly class CreatePendingFollows
     {
         $githubIds = array_values(array_diff(
             $githubIds,
-            User::query()->whereIn('github_id', $githubIds)->get(['github_id'])->map(fn (User $user): string => $user->github_id)->all(),
+            User::query()->whereIn('github_id', $githubIds)->get(['github_id'])->map(fn (User $registered): string => $registered->github_id)->all(),
         ));
 
         if ($githubIds === []) {

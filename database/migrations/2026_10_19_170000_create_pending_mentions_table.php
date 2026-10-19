@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['commit_id', 'username']);
-            $table->index('username');
+            $table->index(['username', 'id']);
         });
     }
 };
