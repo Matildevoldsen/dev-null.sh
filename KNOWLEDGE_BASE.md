@@ -94,7 +94,7 @@ Sources: [onboarding page](resources/js/pages/onboarding/show.tsx), [sign-in tes
 
 Every developer has a profile at `/@{username}`, with their GitHub identity, bio and other public profile information, commit/following/follower counts, a **Follows you** badge when they follow you, and an activity graph. Across a block in either direction, the profile is shown as unavailable. The Commits tab lists top-level commits; Replies lists that developer's replies with parent context. Follow and follower counts open the corresponding people lists. The profile links to GitHub and, when available, GitHub Sponsors. Share uses the device's share sheet when supported, or copies the profile link.
 
-Change your name, avatar, bio, company, location, or website on GitHub, not on /dev/null. Settings → Profile offers **Edit on GitHub** and **Sync from GitHub**. Profile details also refresh on sign-in. Manual sync is limited to once a minute. The GitHub Sponsors link is refreshed on sign-in only. A GitHub username rename is picked up on sign-in or sync; if a stale account still holds the new username because its owner also renamed, that account moves to a `_renamed-<github id>` placeholder until its owner signs in again. Accounts are matched by GitHub id and never merged.
+Change your name, avatar, bio, company, location, or website on GitHub, not on /dev/null. Settings → Profile offers **Edit on GitHub** and **Sync from GitHub**. Profile details also refresh on sign-in. Manual sync is limited to once a minute. The GitHub Sponsors link is refreshed on sign-in only. A GitHub username rename is picked up on sign-in or sync; if a stale account still holds the new username because its owner also renamed, that account moves to a `_renamed-<github id>` placeholder until its owner signs in or syncs again. Accounts are matched by GitHub id and never merged.
 
 Profiles also show [achievement badges and an XP-based Unix rank](#achievement-badges-and-xp). Click a badge or rank to inspect unlock requirements and progress.
 
@@ -411,14 +411,14 @@ A signed request sees what the web shows you, such as your own pending commits. 
 
 - read your account, logs, replies, notifications, and saved commits;
 - commit, reply, and quote, and delete your commits;
-- follow or unfollow;
+- follow or unfollow, mute or unmute, and block or unblock, and list who you muted and blocked;
 - star or unstar, and save or unsave;
 - switch Pastéis mode and give pastéis;
 - report commits;
 - sync from GitHub and save your lane color;
 - delete your account.
 
-Signed request bodies are JSON, so app commits are text only: no images, polls, or link-card choice. Muting, blocking, pinning, Remotes, scheduling, search, and translations are web-only for now. Signed requests are limited to **120 requests per minute per user**. Settings → Devices lists your approved devices with when each was last used, and revokes them.
+Signed request bodies are JSON, so app commits are text only: no images, polls, or link-card choice. Pinning, Remotes, scheduling, search, and translations are web-only for now. Signed requests are limited to **120 requests per minute per user**. Settings → Devices lists your approved devices with when each was last used, and revokes them.
 
 Sources: [signed requests](app/Services/SignedRequests.php), [sign-in page](app/Http/Controllers/MobileAuthorizationController.php), [devices settings](resources/js/pages/device/index.tsx), [API routes](routes/api.php).
 
@@ -432,7 +432,7 @@ Sources: [issue command UI](resources/js/components/issue-command.tsx), [issue v
 
 ### Exporting your data
 
-Choose **Download JSON** in Settings → Profile to export your account data. The export includes profile details, your commits and replies (including pending, rejected, and deleted entries still stored), polls and your votes, stars, bookmarks, follows, mutes, blocks, messages you sent, notifications, SSH key fingerprints, the devices you approved for an app, and active-session metadata. Other people's replies and received messages are not included as your authored data. Message images, message reactions, reports you filed, and scheduled commits are not included either. Image references are URLs, not an archive of the image files.
+Choose **Download JSON** in Settings → Profile to export your account data. The export includes profile details, your commits and replies (including pending, rejected, and deleted entries still stored), polls and your votes, stars, saved commits, follows, mutes, blocks, messages you sent, notifications, SSH key fingerprints, the devices you approved for an app, and active-session metadata. Other people's replies and received messages are not included as your authored data. Message images, message reactions, reports you filed, and scheduled commits are not included either. Image references are URLs, not an archive of the image files.
 
 The export does not expose session IDs, authentication tokens, private SSH keys, or other people's poll choices. Keep the downloaded JSON private because it includes personal account information. Exports are limited to **three per hour**.
 
