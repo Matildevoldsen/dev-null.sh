@@ -17,6 +17,11 @@
 - Run the full PHP suite with code coverage using the CI command: `php -d memory_limit=-1 vendor/bin/pest --parallel --ci --coverage --exactly=100.0 --passthru-php="'-d' 'memory_limit=-1'"`. The `--ci` flag prevents local test-impact analysis from skipping tests. Targeted tests alone are not a substitute for the coverage check.
 - Fix failures introduced by the changes. Never lower coverage thresholds or exclude code just to pass. Report pre-existing failures or environment blockers explicitly; do not claim a check passed when it failed or could not run.
 
+## Product guide maintenance
+
+- `PRODUCT.md` is the product context agents design and build against: who can do what, limits, vocabulary, and what is deliberately excluded. Before finishing any change that adds, removes, or changes user-facing behavior, a limit, an access rule, or a setting, update the matching bullet in `PRODUCT.md` in the same change.
+- When a feature ships that was on the "Deliberately excluded" list, remove it from that list. Never leave a bullet that contradicts the code.
+
 ## Knowledge base maintenance
 
 - Before finishing any change, check whether `KNOWLEDGE_BASE.md` needs updating to reflect it. Update the relevant sections in the same change when stack, hosting, repository details, platform behavior, or lore have changed; leave it alone when they have not.
