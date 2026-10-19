@@ -30,3 +30,15 @@ it('turns the mentions made before the user signed in into mentions of them', fu
         ->and($deleted->refresh()->mentions)->toBe(['ondrejmirtes' => $user->id])
         ->and(PendingMention::query()->pluck('id')->all())->toBe([$unrelated->id]);
 });
+
+it('keeps the mentions of usernames that are numbers', function (): void {
+    $numeric = User::factory()->create(['username' => '123']);
+    $commit = Commit::factory()->create(['body' => 'Thanks @123 and @octocat!', 'mentions' => ['123' => $numeric->id]]);
+    PendingMention::factory()->for($commit)->create(['username' => 'octocat']);
+
+    $user = User::factory()->create(['username' => 'octocat']);
+
+    resolve(UpdateCommitMentions::class)->handle($user, $user->username);
+
+    expect($commit->refresh()->mentions)->toBe(['123' => $numeric->id, 'octocat' => $user->id]);
+});
