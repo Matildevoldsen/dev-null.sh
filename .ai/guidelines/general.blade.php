@@ -19,8 +19,8 @@
 
 ## Product guide maintenance
 
-- `PRODUCT.md` is the product context agents design and build against: who can do what, limits, vocabulary, and what is deliberately excluded. Before finishing any change that adds, removes, or changes user-facing behavior, a limit, an access rule, or a setting, update the matching bullet in `PRODUCT.md` in the same change.
-- When a feature ships that was on the "Deliberately excluded" list, remove it from that list. Never leave a bullet that contradicts the code.
+- `PRODUCT.md` is the short product context agents design and build against: users, positioning, the rules every feature must keep, vocabulary, and what is deliberately excluded. It does not describe features in detail: limits and behavior belong in `KNOWLEDGE_BASE.md` and the code.
+- Update `PRODUCT.md` only when a change adds a whole new area to its one-line feature list, changes one of its rules, or ships something it lists as excluded. Never leave a line that contradicts the code.
 
 ## Knowledge base maintenance
 
