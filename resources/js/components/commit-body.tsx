@@ -71,7 +71,9 @@ export function CommitBody({
 }
 
 /**
- * A body too long to show whole in a list comes with its first lines as a preview, unfolded on demand.
+ * A body too long to show whole in a list comes with its first lines as a preview, unfolded on demand. A posted
+ * commit's mentions of developers who aren't on /dev/null link to their unclaimed profile; a scheduled one, whose
+ * mentions aren't captured yet, has none.
  */
 export function FoldedCommitBody({
     segments,
@@ -93,7 +95,7 @@ export function FoldedCommitBody({
                 segments={segments}
                 mentions={mentions}
                 className={className}
-                linksUnclaimed
+                linksUnclaimed={mentions !== null}
             />
         );
     }
@@ -120,7 +122,7 @@ export function FoldedCommitBody({
                 segments={isUnfolded ? segments : previewSegments}
                 mentions={mentions}
                 className={className}
-                linksUnclaimed
+                linksUnclaimed={mentions !== null}
             />
             {!isUnfolded && (
                 <button

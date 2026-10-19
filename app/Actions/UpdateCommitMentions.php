@@ -18,9 +18,9 @@ final readonly class UpdateCommitMentions
      * profile like any other, a few at a time, since a well-known developer may have been mentioned a lot. The commits
      * keep their update time, since nobody edited them.
      */
-    public function handle(User $user): void
+    public function handle(User $user, string $username): void
     {
-        $username = Str::lower($user->username);
+        $username = Str::lower($username);
 
         PendingMention::query()
             ->where('username', $username)

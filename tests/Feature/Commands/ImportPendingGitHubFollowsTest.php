@@ -96,3 +96,14 @@ it('stops when github rate limits the first request', function (): void {
         ->expectsOutputToContain('GitHub rate limit reached after 0 users. Run the command again later.')
         ->assertFailed();
 });
+
+it('keeps the resume point when github rate limits the first user after it', function (): void {
+    $first = User::factory()->create(['github_follows_imported_at' => now()]);
+    $second = User::factory()->create(['github_follows_imported_at' => now()]);
+
+    Http::fake(["api.github.com/user/{$second->github_id}" => Http::response(['message' => 'API rate limit exceeded'], 403)]);
+
+    $this->artisan('follows:pending', ['--after' => $first->id])
+        ->expectsOutputToContain("GitHub rate limit reached after 0 users. Run the command again with --after={$first->id} later.")
+        ->assertFailed();
+});

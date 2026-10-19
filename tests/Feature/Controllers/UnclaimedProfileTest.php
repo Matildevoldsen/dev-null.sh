@@ -225,3 +225,27 @@ it('does not count who is waiting when loading more mentions', function (): void
                 ->missing('waiting')
                 ->has('commits.data', 1)));
 });
+
+it('leaves out of who is waiting the people across a block from the viewer', function (): void {
+    fakeUnclaimedAccount();
+
+    $viewer = User::factory()->create();
+    $blocked = User::factory()->create();
+    $blocker = User::factory()->create();
+    $visible = PendingFollow::factory()->create(['github_id' => '104888']);
+
+    $viewer->blocking()->attach($blocked);
+    $blocker->blocking()->attach($viewer);
+
+    PendingFollow::factory()->create(['user_id' => $blocked->id, 'github_id' => '104888']);
+    PendingFollow::factory()->create(['user_id' => $blocker->id, 'github_id' => '104888']);
+    mentionOf('ondrejmirtes');
+
+    $this->actingAs($viewer)
+        ->get('/@ondrejmirtes')
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('waiting.count', 3)
+            ->has('waiting.users', 1)
+            ->where('waiting.users.0.id', $visible->user_id));
+});

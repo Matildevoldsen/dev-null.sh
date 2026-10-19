@@ -43,7 +43,7 @@ final readonly class UpdateOrCreateUser
             ]);
 
             if (PendingMention::query()->where('username', Str::lower($user->username))->exists()) {
-                dispatch(new UpdateCommitMentionsJob($user))->afterCommit();
+                dispatch(new UpdateCommitMentionsJob($user, $user->username))->afterCommit();
             }
 
             return $user;

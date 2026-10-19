@@ -80,7 +80,7 @@ test('links mentions of developers who are not on /dev/null to their unclaimed p
     );
 });
 
-test('links mentions in posted commits to unclaimed profiles, but not in messages', () => {
+test('links mentions in posted commits to unclaimed profiles, but not in messages or scheduled commits', () => {
     const segments = [{ type: 'text' as const, text: 'Thanks @OndrejMirtes!' }];
     const commit = renderPage(
         <FoldedCommitBody
@@ -90,6 +90,13 @@ test('links mentions in posted commits to unclaimed profiles, but not in message
         />,
     );
     const message = renderPage(<CommitBody segments={segments} mentions={{}} />);
+    const scheduled = renderPage(
+        <FoldedCommitBody
+            segments={segments}
+            previewSegments={null}
+            mentions={null}
+        />,
+    );
 
     assert.ok(
         commit.includes(
@@ -97,6 +104,7 @@ test('links mentions in posted commits to unclaimed profiles, but not in message
         ),
     );
     assert.ok(message.includes('Thanks @OndrejMirtes!'));
+    assert.ok(scheduled.includes('Thanks @OndrejMirtes!'));
 });
 
 test('keeps captured mention identities in regular bodies alongside highlighted code', () => {

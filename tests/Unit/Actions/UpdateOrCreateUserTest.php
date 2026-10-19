@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use App\Actions\UpdateOrCreateUser;
+use App\Jobs\UpdateCommitMentionsJob;
 use App\Models\Commit;
 use App\Models\PendingMention;
 use App\Models\User;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Socialite\Two\User as GitHubUser;
 
 it('creates a user from github', function (): void {
@@ -294,4 +296,16 @@ it('turns the mentions made before the user signed in into mentions of them', fu
 
     expect($commit->refresh()->mentions)->toBe(['octocat' => $user->id])
         ->and(PendingMention::query()->count())->toBe(0);
+});
+
+it('turns the mentions of the username the user signed in with, even after a rename', function (): void {
+    Queue::fake();
+    fakeGitHubSponsorsListing();
+
+    PendingMention::factory()->create(['username' => 'octocat']);
+
+    $user = resolve(UpdateOrCreateUser::class)->handle(GitHubUser::fake(['id' => 583231, 'nickname' => 'octocat']));
+    $user->update(['username' => 'renamed']);
+
+    Queue::assertPushed(UpdateCommitMentionsJob::class, fn (UpdateCommitMentionsJob $job): bool => $job->user->is($user) && $job->username === 'octocat');
 });

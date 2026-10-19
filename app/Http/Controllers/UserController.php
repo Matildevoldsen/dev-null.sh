@@ -92,7 +92,9 @@ final readonly class UserController
     }
 
     /**
-     * A GitHub account renamed since its owner last signed in still has their profile, under its old username.
+     * The profile of a developer who isn't on /dev/null yet, waiting for them to claim it: what GitHub says about them,
+     * who is waiting to follow them, and the commits that mention them. A GitHub account renamed since its owner last
+     * signed in goes to the profile they already have, under its old username.
      */
     private function unclaimed(ShowUserRequest $request, GitHubAccount $account, ?User $currentUser, PendingMentionCommitsQuery $mentions, PendingFollowersQuery $pendingFollowers, PageMetadata $metadata): Response|RedirectResponse
     {
@@ -103,8 +105,8 @@ final readonly class UserController
         }
 
         $waiting = null;
-        $getWaiting = function () use (&$waiting, $pendingFollowers, $account): array {
-            return $waiting ??= $pendingFollowers->get($account->id);
+        $getWaiting = function () use (&$waiting, $pendingFollowers, $account, $currentUser): array {
+            return $waiting ??= $pendingFollowers->get($account->id, $currentUser);
         };
 
         return Inertia::render('user/unclaimed', [

@@ -15,13 +15,16 @@ final class UpdateCommitMentionsJob implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public User $user)
+    /**
+     * The username is the one the user signed in with, which a later rename must not change.
+     */
+    public function __construct(public User $user, public string $username)
     {
         //
     }
 
     public function handle(UpdateCommitMentions $updateCommitMentions): void
     {
-        $updateCommitMentions->handle($this->user);
+        $updateCommitMentions->handle($this->user, $this->username);
     }
 }

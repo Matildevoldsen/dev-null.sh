@@ -23,9 +23,8 @@ final class ImportPendingGitHubFollowsCommand extends Command
     {
         $imported = 0;
         $failed = 0;
-        $lastId = null;
-
         $after = $this->option('after');
+        $lastId = is_string($after) ? $after : null;
 
         $users = User::query()
             ->whereNotNull('github_follows_imported_at')

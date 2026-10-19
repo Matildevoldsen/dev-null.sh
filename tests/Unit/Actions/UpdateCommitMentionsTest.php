@@ -23,7 +23,7 @@ it('turns the mentions made before the user signed in into mentions of them', fu
     $user = User::factory()->create(['username' => 'OndrejMirtes']);
     $updatedAt = $commit->updated_at;
 
-    resolve(UpdateCommitMentions::class)->handle($user);
+    resolve(UpdateCommitMentions::class)->handle($user, $user->username);
 
     expect($commit->refresh()->mentions)->toBe(['taylor' => $taylor->id, 'ondrejmirtes' => $user->id])
         ->and($commit->updated_at->equalTo($updatedAt))->toBeTrue()
