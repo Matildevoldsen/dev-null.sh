@@ -11,6 +11,7 @@ declare module '@inertiajs/core' {
             restored?: Commit;
             scheduled?: boolean;
             localSignIn?: boolean;
+            signedUp?: boolean;
         };
         sharedPageProps: {
             name: string;

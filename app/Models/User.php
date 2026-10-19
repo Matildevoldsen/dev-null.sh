@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Actions\CreateTomFriendship;
+use App\Actions\CreateWorldReply;
 use App\Enums\Log;
 use App\Enums\RemotesFrom;
 use Carbon\CarbonInterface;
@@ -47,6 +48,7 @@ use Illuminate\Support\Facades\DB;
  * @property-read CarbonInterface|null $github_follows_imported_at
  * @property-read string|null $remember_token
  * @property-read CarbonInterface|null $github_synced_at
+ * @property-read CarbonInterface|null $last_seen_at
  * @property-read CarbonInterface $created_at
  * @property-read CarbonInterface $updated_at
  * @property-read Collection<int, Commit> $commits
@@ -83,6 +85,7 @@ use Illuminate\Support\Facades\DB;
     'log',
     'onboarded_at',
     'github_follows_imported_at',
+    'last_seen_at',
 ])]
 final class User extends Authenticatable
 {
@@ -92,6 +95,11 @@ final class User extends Authenticatable
     use HasUuids;
 
     public const int DAILY_PASTEIS = 10;
+
+    /**
+     * The accounts that never sign in, which product metrics leave out: Tom and @world.
+     */
+    public const array BOT_GITHUB_IDS = [CreateTomFriendship::GITHUB_ID, CreateWorldReply::GITHUB_ID];
 
     /**
      * @var array<string, mixed>
@@ -105,7 +113,16 @@ final class User extends Authenticatable
         'pasteis_received' => 0,
         'pasteis_given_today' => 0,
         'pasteis_given_on' => null,
+        'last_seen_at' => null,
     ];
+
+    /**
+     * The bots as a Postgres array, for raw queries that leave them out with `github_id <> all(?::text[])`.
+     */
+    public static function botGitHubIdsArray(): string
+    {
+        return '{'.implode(',', self::BOT_GITHUB_IDS).'}';
+    }
 
     /**
      * @return array<string, string>
@@ -140,6 +157,7 @@ final class User extends Authenticatable
             'github_follows_imported_at' => 'datetime',
             'remember_token' => 'string',
             'github_synced_at' => 'datetime',
+            'last_seen_at' => 'date',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

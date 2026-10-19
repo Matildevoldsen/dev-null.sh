@@ -59,6 +59,7 @@ final readonly class CreateExport
                 'remotes_from' => $user->remotes_from->value,
                 'pull_receipts' => $user->pull_receipts,
                 'pinned_commit_id' => $user->pinned_commit_id,
+                'last_seen_at' => $user->last_seen_at?->toDateString(),
                 'created_at' => $user->created_at->toIso8601String(),
                 'updated_at' => $user->updated_at->toIso8601String(),
             ],
