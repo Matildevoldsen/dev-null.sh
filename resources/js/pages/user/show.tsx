@@ -21,10 +21,13 @@ import { ActivityStreaks } from '@/components/activity-streaks';
 import { CommitFeed, EmptyFeed } from '@/components/commit-feed';
 import { FollowButton } from '@/components/follow-button';
 import { GitHubIcon } from '@/components/github-icon';
-import { LinkEmbed } from '@/components/link-embed';
-import { LiveBadge } from '@/components/live-badge';
+import {
+    LiveAvatarMarker,
+    LiveStreamTrigger,
+} from '@/components/live-stream-card';
 import { PageTabs } from '@/components/page-tabs';
 import { PinCommitButton } from '@/components/pin-commit-button';
+import { ProfileActionsMenu } from '@/components/profile-actions-menu';
 import { ProfileShareButton } from '@/components/profile-share-button';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/user-avatar';
@@ -38,7 +41,6 @@ import type {
     Activity,
     Commit,
     CursorPaginated,
-    Embed,
     Profile,
     Streaks,
 } from '@/types';
@@ -49,7 +51,6 @@ function pluralize(count: number, singular: string, plural: string) {
 
 export default function Show({
     user,
-    liveEmbed,
     pasteisReceived,
     isFollowing,
     followsYou,
@@ -63,7 +64,6 @@ export default function Show({
     pinnedCommit,
 }: {
     user: Profile;
-    liveEmbed: Embed | null;
     pasteisReceived: number | null;
     isFollowing: boolean;
     followsYou: boolean;
@@ -115,12 +115,36 @@ export default function Show({
 
             <header className="border-b px-4 pt-6 pb-5 sm:px-6">
                 <div className="flex items-start justify-between gap-4">
-                    <UserAvatar
-                        user={user}
-                        className="size-20 text-2xl ring-2 ring-(--lane) ring-offset-4 ring-offset-card"
-                        pixels={160}
-                        style={{ '--lane': lane } as CSSProperties}
-                    />
+                    {user.live ? (
+                        <LiveStreamTrigger
+                            user={user}
+                            showProfile={false}
+                            className="flex"
+                        >
+                            <a
+                                href={user.live.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Watch ${user.name} live on YouTube`}
+                                className="relative flex rounded-full"
+                                data-test="profile-live-avatar"
+                            >
+                                <UserAvatar
+                                    user={user}
+                                    className="size-20 text-2xl ring-2 ring-red-600 ring-offset-4 ring-offset-card"
+                                    pixels={160}
+                                />
+                                <LiveAvatarMarker className="-bottom-2.5" />
+                            </a>
+                        </LiveStreamTrigger>
+                    ) : (
+                        <UserAvatar
+                            user={user}
+                            className="size-20 text-2xl ring-2 ring-(--lane) ring-offset-4 ring-offset-card"
+                            pixels={160}
+                            style={{ '--lane': lane } as CSSProperties}
+                        />
+                    )}
 
                     <div className="flex shrink-0 gap-1.5 sm:gap-2">
                         <ProfileShareButton
@@ -128,16 +152,19 @@ export default function Show({
                             href={show(user).url}
                         />
                         {isCurrentUser ? (
-                            <Button variant="outline" asChild>
-                                <a
-                                    href="https://github.com/settings/profile"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Edit on GitHub
-                                    <ArrowUpRight />
-                                </a>
-                            </Button>
+                            <>
+                                <ProfileActionsMenu user={user} />
+                                <Button variant="outline" asChild>
+                                    <a
+                                        href="https://github.com/settings/profile"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Edit on GitHub
+                                        <ArrowUpRight />
+                                    </a>
+                                </Button>
+                            </>
                         ) : (
                             <>
                                 {auth.user && (
@@ -178,9 +205,8 @@ export default function Show({
                     </div>
                 </div>
 
-                <h1 className="mt-4 flex items-center gap-2 text-2xl font-semibold tracking-tight text-balance">
+                <h1 className="mt-4 text-2xl font-semibold tracking-tight text-balance">
                     {user.name}
-                    {liveEmbed && <LiveBadge />}
                 </h1>
                 <div className="flex items-center gap-2">
                     <p className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
@@ -222,22 +248,6 @@ export default function Show({
                     <p className="mt-3 max-w-prose text-[15px] leading-relaxed wrap-break-word whitespace-pre-wrap">
                         {user.bio}
                     </p>
-                )}
-
-                {liveEmbed && user.live_url && (
-                    <div className="max-w-xl" data-test="profile-live-stream">
-                        <LinkEmbed
-                            preview={{
-                                url: user.live_url,
-                                title: `${user.name} is live`,
-                                description: null,
-                                image_url: null,
-                                site_name: liveEmbed.provider,
-                                is_pending: false,
-                            }}
-                            embed={liveEmbed}
-                        />
-                    </div>
                 )}
 
                 <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">

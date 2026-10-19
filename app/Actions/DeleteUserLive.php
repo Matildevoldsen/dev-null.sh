@@ -10,6 +10,6 @@ final readonly class DeleteUserLive
 {
     public function handle(User $user): void
     {
-        $user->update(['live_url' => null, 'live_since' => null]);
+        $user->update(['live_platform' => null, 'live_url' => null, 'live_ends_at' => null]);
     }
 }

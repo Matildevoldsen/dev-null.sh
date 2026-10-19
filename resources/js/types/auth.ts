@@ -6,6 +6,11 @@ import type { Log } from '@/types/log';
  */
 export type Lane = number | string;
 
+export type LiveStream = {
+    url: string;
+    thumbnail_url: string;
+};
+
 export type User = {
     id: string;
     username: string;
@@ -22,7 +27,7 @@ export type User = {
     /**
      * Only set while the user is streaming.
      */
-    live_url?: string | null;
+    live?: LiveStream | null;
     created_at: string;
     updated_at: string;
 };

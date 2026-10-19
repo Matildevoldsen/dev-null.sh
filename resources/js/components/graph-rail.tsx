@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { LiveBadge } from '@/components/live-badge';
+import { LiveAvatarMarker } from '@/components/live-stream-card';
 import { UserAvatar } from '@/components/user-avatar';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types';
@@ -166,10 +166,10 @@ export function RailAvatar({
     user,
     isStaged = false,
 }: {
-    user: Pick<User, 'name' | 'avatar_url' | 'live_url'>;
+    user: Pick<User, 'name' | 'avatar_url' | 'live'>;
     isStaged?: boolean;
 }) {
-    const isLive = Boolean(user.live_url);
+    const isLive = Boolean(user.live);
 
     return (
         <span className="relative flex rounded-full bg-card">
@@ -183,7 +183,7 @@ export function RailAvatar({
                 <UserAvatar user={user} className="size-10" />
             </span>
             {isLive && (
-                <LiveBadge className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-1 text-[9px] leading-3.5 ring-2 ring-card" />
+                <LiveAvatarMarker className="px-1 text-[9px] leading-3.5" />
             )}
         </span>
     );

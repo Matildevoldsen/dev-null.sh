@@ -25,6 +25,7 @@ import {
     RailSegment,
 } from '@/components/graph-rail';
 import { LinkPreview } from '@/components/link-preview';
+import { LiveStreamTrigger } from '@/components/live-stream-card';
 import { QuotedCommit } from '@/components/quoted-commit';
 import {
     ThreadPositionBadge,
@@ -182,22 +183,31 @@ export function CommitCard({
                             anchor={nodeRef}
                             className="flex"
                         >
-                            <Link
-                                ref={nodeRef}
-                                href={show(commit.user)}
-                                tabIndex={-1}
-                                className={cn('group/node flex rounded-full', {
-                                    'translate-y-[-9px]':
-                                        isGroupedWithPrevious &&
-                                        railNodePosition === 'top',
-                                })}
+                            <LiveStreamTrigger
+                                user={commit.user}
+                                hoverCard={false}
+                                className="flex"
                             >
-                                {isGroupedWithPrevious ? (
-                                    <RailDot className="group-hover/node:scale-125" />
-                                ) : (
-                                    <RailAvatar user={commit.user} />
-                                )}
-                            </Link>
+                                <Link
+                                    ref={nodeRef}
+                                    href={show(commit.user)}
+                                    tabIndex={-1}
+                                    className={cn(
+                                        'group/node flex rounded-full',
+                                        {
+                                            'translate-y-[-9px]':
+                                                isGroupedWithPrevious &&
+                                                railNodePosition === 'top',
+                                        },
+                                    )}
+                                >
+                                    {isGroupedWithPrevious ? (
+                                        <RailDot className="group-hover/node:scale-125" />
+                                    ) : (
+                                        <RailAvatar user={commit.user} />
+                                    )}
+                                </Link>
+                            </LiveStreamTrigger>
                         </UserPreview>
                     }
                 />

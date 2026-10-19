@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Enums\LivePlatform;
 use App\Models\User;
 
 final readonly class UpdateUserLive
 {
-    public function handle(User $user, string $url): void
+    public function handle(User $user, LivePlatform $platform, string $url, int $hours): void
     {
-        $user->update(['live_url' => $url, 'live_since' => now()]);
+        $user->update([
+            'live_platform' => $platform,
+            'live_url' => $platform->driver()->stream($url)->url,
+            'live_ends_at' => now()->addHours($hours),
+        ]);
     }
 }

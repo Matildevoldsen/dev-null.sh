@@ -15,7 +15,7 @@ final readonly class UserLiveController
 {
     public function update(UpdateUserLiveRequest $request, #[CurrentUser] User $user, UpdateUserLive $action): RedirectResponse
     {
-        $action->handle($user, $request->string('url')->trim()->value());
+        $action->handle($user, $request->platform(), $request->url(), $request->integer('hours'));
 
         return back();
     }

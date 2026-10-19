@@ -11,8 +11,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table): void {
+            $table->string('live_platform')->nullable();
             $table->string('live_url', 2048)->nullable();
-            $table->timestamp('live_since')->nullable();
+            $table->timestamp('live_ends_at')->nullable();
         });
     }
 };
