@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Dto\GitHubAccount;
 use App\Enums\CommitStatus;
 use App\Models\Commit;
 use App\Models\LinkPreview;
@@ -237,6 +238,37 @@ final readonly class PageMetadata
                     ],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * The link preview of a profile waiting to be claimed. It isn't indexed, since its owner never asked for it.
+     *
+     * @return array{type: string, title: string, description: string, url: string, robots: string, images: list<Image>, username: string}
+     */
+    public function unclaimed(GitHubAccount $account, int $waiting): array
+    {
+        $username = $account->profile->username;
+        $title = $account->profile->name === $username ? "@{$username} on /dev/null" : "{$account->profile->name} (@{$username}) on /dev/null";
+
+        return [
+            'type' => 'profile',
+            'title' => $title,
+            'description' => match ($waiting) {
+                0 => "@{$username} is not on /dev/null yet, but developers here are mentioning them.",
+                1 => "@{$username} is not on /dev/null yet. 1 developer is waiting to follow.",
+                default => "@{$username} is not on /dev/null yet. {$waiting} developers are waiting to follow.",
+            },
+            'url' => route('user.show', ['user' => $username]),
+            'robots' => self::NOT_INDEXABLE,
+            'images' => [[
+                'url' => url('/og.png'),
+                'width' => OpenGraphCanvas::WIDTH,
+                'height' => OpenGraphCanvas::HEIGHT,
+                'type' => 'image/png',
+                'alt' => $title,
+            ]],
+            'username' => $username,
         ];
     }
 

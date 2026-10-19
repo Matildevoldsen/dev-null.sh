@@ -11,11 +11,17 @@ export function CommitBody({
     mentions,
     className,
     isStatic = false,
+    linksUnclaimed = false,
 }: {
     segments: BodySegment[];
     mentions: Commit['mentions'];
     className?: string;
     isStatic?: boolean;
+    /**
+     * Whether mentions of developers who aren't on /dev/null link to their unclaimed profile, which only posted
+     * commits give them.
+     */
+    linksUnclaimed?: boolean;
 }) {
     const { auth } = usePage().props;
 
@@ -37,6 +43,7 @@ export function CommitBody({
                                 mentions={mentions}
                                 pasteisMode={Boolean(auth.pasteis)}
                                 isStatic={isStatic}
+                                linksUnclaimed={linksUnclaimed}
                             />
                         );
                     case 'code':
@@ -86,6 +93,7 @@ export function FoldedCommitBody({
                 segments={segments}
                 mentions={mentions}
                 className={className}
+                linksUnclaimed
             />
         );
     }
@@ -112,6 +120,7 @@ export function FoldedCommitBody({
                 segments={isUnfolded ? segments : previewSegments}
                 mentions={mentions}
                 className={className}
+                linksUnclaimed
             />
             {!isUnfolded && (
                 <button

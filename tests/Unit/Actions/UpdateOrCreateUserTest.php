@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Actions\UpdateOrCreateUser;
+use App\Models\Commit;
+use App\Models\PendingMention;
 use App\Models\User;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -278,3 +280,18 @@ it('frees a username still held by a stale user who renamed on github', function
         ->and($stale->github_id)->toBe('1')
         ->and($stale->bio)->toBe('Renamed away');
 })->with(['octocat', 'OctoCat']);
+
+it('turns the mentions made before the user signed in into mentions of them', function (): void {
+    fakeGitHubSponsorsListing();
+
+    $commit = Commit::factory()->create(['body' => 'Thanks @octocat!', 'mentions' => []]);
+    PendingMention::factory()->for($commit)->create(['username' => 'octocat']);
+
+    $user = resolve(UpdateOrCreateUser::class)->handle(GitHubUser::fake([
+        'id' => 583231,
+        'nickname' => 'octocat',
+    ]));
+
+    expect($commit->refresh()->mentions)->toBe(['octocat' => $user->id])
+        ->and(PendingMention::query()->count())->toBe(0);
+});

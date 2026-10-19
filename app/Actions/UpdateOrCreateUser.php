@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Dto\GitHubProfile;
+use App\Jobs\UpdateCommitMentionsJob;
+use App\Models\PendingMention;
 use App\Models\User;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Two\User as GitHubUser;
 
 final readonly class UpdateOrCreateUser
@@ -30,7 +33,7 @@ final readonly class UpdateOrCreateUser
         return DB::transaction(function () use ($githubId, $profile, $email, $hasSponsorsListing): User {
             $this->updateStaleUsernames->handle($profile->username, $githubId);
 
-            return User::query()->updateOrCreate([
+            $user = User::query()->updateOrCreate([
                 'github_id' => $githubId,
             ], [
                 ...$profile->attributes(),
@@ -38,6 +41,12 @@ final readonly class UpdateOrCreateUser
                 'github_synced_at' => now(),
                 ...($hasSponsorsListing === null ? [] : ['has_sponsors_listing' => $hasSponsorsListing]),
             ]);
+
+            if (PendingMention::query()->where('username', Str::lower($user->username))->exists()) {
+                dispatch(new UpdateCommitMentionsJob($user))->afterCommit();
+            }
+
+            return $user;
         });
     }
 

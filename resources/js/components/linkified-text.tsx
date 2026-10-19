@@ -9,6 +9,7 @@ import { typedProse } from '@/lib/code';
 import { shortenUrl } from '@/lib/urls';
 import { shortHash } from '@/lib/utils';
 import { show } from '@/routes/mention';
+import { show as showProfile } from '@/routes/user';
 import type { Commit } from '@/types';
 
 // Keep these rules in sync with app/Services/Urls.php and app/Services/Mentions.php.
@@ -331,6 +332,7 @@ function withMentions(
     mentions: Commit['mentions'],
     pasteisMode: boolean,
     isStatic: boolean,
+    linksUnclaimed: boolean,
 ): ReactNode[] {
     const parts: ReactNode[] = [];
     let position = 0;
@@ -344,8 +346,19 @@ function withMentions(
 
         parts.push(
             ...withWordmarks(text.slice(position, match.index), pasteisMode),
-            isStatic || !userId ? (
+            isStatic || (!userId && !linksUnclaimed) ? (
                 match[0]
+            ) : !userId ? (
+                // Nobody here has the username yet: it links to the profile waiting for them to claim it.
+                <Link
+                    key={`mention-${offset + match.index}`}
+                    href={showProfile(match[1])}
+                    rel="nofollow"
+                    className="font-medium text-primary hover:underline"
+                    data-test="unclaimed-mention"
+                >
+                    {match[0]}
+                </Link>
             ) : (
                 <UserPreview
                     key={`mention-${offset + match.index}`}
@@ -376,11 +389,16 @@ export function LinkifiedText({
     mentions,
     pasteisMode = false,
     isStatic = false,
+    linksUnclaimed = false,
 }: {
     text: string;
     mentions: Commit['mentions'];
     pasteisMode?: boolean;
     isStatic?: boolean;
+    /**
+     * Whether a mention of someone who isn't on /dev/null links to their unclaimed profile, which commits give them.
+     */
+    linksUnclaimed?: boolean;
 }) {
     const parts: ReactNode[] = [];
     let position = 0;
@@ -403,6 +421,7 @@ export function LinkifiedText({
                 mentions,
                 pasteisMode,
                 isStatic,
+                linksUnclaimed,
             ),
             commitLink ? (
                 <CommitLink
@@ -448,6 +467,7 @@ export function LinkifiedText({
             mentions,
             pasteisMode,
             isStatic,
+            linksUnclaimed,
         ),
     );
 
